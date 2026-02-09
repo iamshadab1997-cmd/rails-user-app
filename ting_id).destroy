@@ -1,0 +1,11 @@
+=> 
+[[32m#<Comment:0x000077c7c9a12148[0m
+  id: [34m[1m1[0m,
+  body: [31m[1m"[0m[31mThis is a comment for Shadab[0m[31m[1m"[0m,
+  author_name: [36m[1mnil[0m,
+  email: [36m[1mnil[0m,
+  approved: [36m[1mnil[0m,
+  commentable_id: [34m[1m1[0m,
+  created_at: [31m[1m"[0m[31m2026-02-03 09:33:10.680944000 +0000[0m[31m[1m"[0m,
+  updated_at: [31m[1m"[0m[31m2026-02-03 09:33:10.680944000 +0000[0m[31m[1m"[0m,
+  commentable_type: [31m[1m"[0m[31mUser[0m[31m[1m"[0m[32m>[0m]

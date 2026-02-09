@@ -1,0 +1,14 @@
+<h1>All Addresses</h1>
+
+<% @addresses.each do |address| %>
+  <p>
+    <strong>User:</strong> <%= address.user.name %> <br>
+    <strong>Street:</strong> <%= address.street %> <br>
+    <strong>City:</strong> <%= address.city %> <br>
+    <strong>State:</strong> <%= address.state %> <br>
+    <strong>Country:</strong> <%= address.country %> <br>
+    <strong>Postal Code:</strong> <%= address.postal_code %> <br>
+    <strong>Address Type:</strong> <%= address.address_type %>
+  </p>
+  <hr>
+<% end %>

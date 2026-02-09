@@ -1,0 +1,12 @@
+<h1>Profile for <%= @user.name %></h1>
+
+<p><strong>Phone:</strong> <%= @profile.phone %></p>
+<p><strong>Address:</strong> <%= @profile.address %></p>
+<p><strong>Bio:</strong> <%= @profile.bio %></p>
+
+<%= link_to "Edit", edit_user_profile_path(@user) %> |
+<%= link_to "Back to Users", users_path %> |
+<%= link_to "Delete Profile", user_profile_path(@user),
+            method: :delete,
+            data: { confirm: "Are you sure?" } %>
+

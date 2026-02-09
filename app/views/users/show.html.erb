@@ -1,0 +1,374 @@
+<h1><%= @user.name %> - Details</h1>
+
+
+<h1>User Details</h1>
+
+<p>
+  <strong>Name:</strong>
+  <%= @user.name %>
+</p>
+
+<p>
+  <strong>Email:</strong>
+  <%= @user.email %>
+</p>
+
+<%= link_to "Edit", edit_user_path(@user) %> |
+<%= link_to "Back", users_path %> |
+<%= link_to "Delete", user_path(@user),
+    method: :delete,
+    data: { confirm: "Are you sure?" } %>
+
+<h1><%= @user.name %> (<%= @user.role.titleize %>)</h1>
+
+<h2>Profile:</h2>
+<% if @profile.present? %>
+  <p><strong>Phone:</strong> <%= @profile.phone %></p>
+  <p><strong>Address:</strong> <%= @profile.address %></p>
+  <p><strong>Bio:</strong> <%= @profile.bio %></p>
+  <%= link_to "Edit Profile", edit_user_profile_path(@user) %> |
+  <%= link_to "Delete Profile", user_profile_path(@user), method: :delete, data: { confirm: "Are you sure?" } %>
+<% else %>
+  <p>No profile yet. <%= link_to "Add Profile", new_user_profile_path(@user) %></p>
+<% end %>
+
+<h2>Addresses:</h2>
+<% (@addresses || []).each do |address| %>
+  <div style="border:1px solid #ccc; padding:10px; margin-bottom:15px; border-radius:8px; background-color:#f9f9f9;">
+    <p>
+      <strong>Street:</strong> <%= address.street %><br>
+      <strong>City:</strong> <%= address.city %><br>
+      <strong>State:</strong> <%= address.state %><br>
+     <strong>Type:</strong> <%= address.address_type %>
+    </p>
+  </div>
+<% end %>
+
+<h2>Documents:</h2>
+<% if @user.documents.attached? %>
+  <% @user.documents.each do |doc| %>
+    <% if doc.image? %>
+      <%= image_tag doc, width: 120 %><br>
+    <% else %>
+      <%= link_to doc.filename, url_for(doc), target: "_blank" %><br>
+    <% end %>
+    <%= link_to "Remove", remove_document_user_path(@user, document_id: doc.id), method: :delete, data: { confirm: "Remove this document?" } %>
+  <% end %>
+<% else %>
+  <p>No documents uploaded.</p>
+<% end %>
+
+
+    
+
+
+<!-- Cart -->
+<h2>Cart:</h2>
+<% if @cart.present? %>
+  <p><strong>Total Items:</strong> <%= @cart.total_items %></p>
+  <p><strong>Total Price:</strong> ₹<%= @cart.total_price %></p>
+<% else %>
+  <p><em>No cart available.</em></p>
+<% end %>
+
+
+
+
+<h2>Addresses:</h2>
+<% @addresses.each do |address| %>
+  <div style="border:1px solid #ccc; padding:10px; margin-bottom:15px; border-radius:8px; background-color:#f9f9f9;">
+    <p>
+      <strong>Street:</strong> <%= address.street %><br>
+      <strong>City:</strong> <%= address.city %><br>
+      <strong>State:</strong> <%= address.state %><br>
+      <strong>Country:</strong> <%= address.country %><br>
+      <strong>Type:</strong> <%= address.address_type.capitalize %>
+    </p>
+
+    <!-- Display Attachments -->
+    <% if address.attachments.attached? %>
+      <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:10px;">
+        <% address.attachments.each do |att| %>
+          <% if att.image? %>
+            <%= image_tag att.variant(resize_to_limit: [150, 150]),
+                          alt: "Address Image",
+                          style: "border-radius:8px; border:1px solid #ccc;" %>
+          <% else %>
+            <p>
+              <%= link_to att.filename, url_for(att), target: "_blank" %>
+            </p>
+          <% end %>
+        <% end %>
+      </div>
+    <% else %>
+      <p><em>No attachments uploaded for this address.</em></p>
+    <% end %>
+  </div>
+<% end %>
+
+
+
+<h2>Products:</h2>
+<% @products.each do |product| %>
+  <div style="border:1px solid #ccc; padding:15px; margin-bottom:15px; border-radius:8px; background-color:#f9f9f9;">
+    <p>
+      <strong>Name:</strong> <%= product.name %> |
+      <strong>Price:</strong> ₹<%= product.price %> |
+      <strong>Stock:</strong> <%= product.stock %>
+    </p>
+
+    <% if product.images.attached? %>
+      <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:10px;">
+        <% product.images.each do |img| %>
+          <%= image_tag img.variant(resize_to_limit: [150, 150]), 
+                        alt: product.name, 
+                        style: "border-radius:8px; border:1px solid #ccc;" %>
+        <% end %>
+      </div>
+    <% else %>
+      <p><em>No images uploaded for this product.</em></p>
+    <% end %>
+
+    <!-- Inventories -->
+    <% if product.inventories.any? %>
+      <strong>Inventories:</strong>
+      <% product.inventories.each do |inv| %>
+        <p>Quantity: <%= inv.quantity %></p>
+      <% end %>
+    <% else %>
+      <p><em>No inventories available for this product.</em></p>
+    <% end %>
+
+  </div>
+<% end %>
+
+
+
+
+<h2>Categories</h2>
+
+<% if @products.any? %>
+  <% categories = @products.map(&:categories).flatten.uniq %>
+  <% if categories.any? %>
+    <ul>
+      <% categories.each do |category| %>
+        <li><%= category.title %></li>
+      <% end %>
+    </ul>
+  <% else %>
+    <p><em>No categories assigned.</em></p>
+  <% end %>
+<% else %>
+  <p><em>No products available, so no categories.</em></p>
+<% end %>
+
+
+<h2>Orders:</h2>
+<% @orders.each do |order| %>
+  <p>
+    <strong>Order #:</strong> <%= order.order_number %> |
+    <strong>Total:</strong> <%= order.total_amount %> |
+    <strong>Status:</strong> <%= order.status %>
+  </p>
+
+  <strong>Payments:</strong>
+  <% order.payments.each do |payment| %>
+    <p>
+      <%= payment.payment_method %>: <%= payment.amount %> | Status: <%= payment.status || "pending" %>
+    </p>
+  <% end %>
+  <hr>
+<% end %>
+
+
+<h2>Wishlists</h2>
+
+<% if @wishlists.any? %>
+  <% @wishlists.each do |wishlist| %>
+    <p><strong><%= wishlist.name %></strong></p>
+
+    <% if wishlist.products.any? %>
+      <% wishlist.products.each do |product| %>
+        <p style="margin-left:20px;">
+          • <%= product.name %> (₹<%= product.price %>)
+        </p>
+      <% end %>
+    <% else %>
+      <p style="margin-left:20px;"><em>No products in this wishlist.</em></p>
+    <% end %>
+    <hr>
+  <% end %>
+<% else %>
+  <p><em>No wishlists available.</em></p>
+<% end %>
+
+
+<h2>Audit Logs</h2>
+
+<% if @user.audit_logs.any? %>
+  <ul>
+    <% @user.audit_logs.each do |log| %>
+      <li>
+        <strong><%= log.action %></strong> - 
+        <%= log.created_at.strftime("%d %b %Y, %H:%M") %>
+      </li>
+    <% end %>
+  </ul>
+<% else %>
+  <p><em>No audit logs available.</em></p>
+<% end %>
+
+
+<h2>Blog Posts</h2>
+
+<% if @user.blog_posts.any? %>
+  <% @user.blog_posts.each do |post| %>
+    <div style="border:1px solid #ddd; padding:15px; margin-bottom:15px; border-radius:8px; background-color:#f9f9f9;">
+      <h3 style="margin-bottom:5px;"><%= post.title %></h3>
+      <p style="font-size:14px; color:#555;"><%= post.content %></p>
+      <p style="font-size:12px; color:#999;">
+        Slug: <%= post.slug %> | Created at: <%= post.created_at.strftime("%d %b %Y, %H:%M") %>
+      </p>
+    </div>
+  <% end %>
+<% else %>
+  <p><em>No blog posts available.</em></p>
+<% end %>
+
+<h2>Comments</h2>
+
+<% if @comments.present? %>
+  <ul>
+    <% @comments.each do |comment| %>
+      <li>
+        <p><%= comment.body %></p>
+      </li>
+    <% end %>
+  </ul>
+<% else %>
+  <p>No comments yet.</p>
+<% end %>
+
+
+<h2>Events</h2>
+
+<% if @events.any? %>
+  <% @events.each do |event| %>
+    <p>
+      <strong>Name:</strong> <%= event.name %><br>
+      <strong>Location:</strong> <%= event.location %><br>
+      <strong>Start Time:</strong> <%= event.start_time %><br>
+      <strong>End Time:</strong> <%= event.end_time %>
+    </p>
+    <hr>
+  <% end %>
+<% else %>
+  <p><em>No events available.</em></p>
+<% end %>
+
+<h2>Messages Sent</h2>
+<% if @messages_sent.present? %>
+  <% @messages_sent.each do |msg| %>
+    <p>
+      <strong>To:</strong> <%= msg.receiver&.name || "Deleted User" %> <br>
+      <strong>Message:</strong> <%= msg.body %> <br>
+    </p>
+  <% end %>
+<% else %>
+  <p>No messages sent.</p>
+<% end %>
+
+<h2>Messages Received</h2>
+<% if @messages_received.any? %>
+  <% @messages_received.each do |msg| %>
+    <p>
+      <strong>From:</strong> <%= msg.sender.name %> <br>
+      <strong>Message:</strong> <%= msg.body %> <br>
+      <em>Received at: <%= msg.created_at.strftime("%b %d, %Y %H:%M") %></em>
+    </p>
+    <hr>
+  <% end %>
+<% else %>
+  <p><em>No messages received.</em></p>
+<% end %>
+
+<h2>Notifications</h2>
+
+<% if @notifications&.any? %>
+  <ul>
+    <% @notifications.each do |notification| %>
+      <li>
+        <strong>Status:</strong> <%= notification.read ? "Read" : "Unread" %> <br>
+        <strong>Message:</strong> <%= notification.message %>
+      </li>
+    <% end %>
+  </ul>
+<% else %>
+  <p>No notifications yet.</p>
+<% end %>
+
+
+
+<h2><%= @user.name %>'s Reviews</h2>
+
+<% if @reviews.any? %>
+  <% @reviews.each do |review| %>
+    <div class="review-card" style="border:1px solid #ccc; padding:10px; margin-bottom:10px;">
+      <p><strong>Product:</strong> <%= review.product.name %></p>
+      <p><strong>Rating:</strong> <%= review.rating %> / 5</p>
+      <p><strong>Comment:</strong> <%= review.comment %></p>
+      <p><strong>Approved:</strong> <%= review.approved ? "Yes" : "No" %></p>
+    </div>
+  <% end %>
+<% else %>
+  <p>No reviews yet.</p>
+<% end %>
+
+<h2>Subscriptions</h2>
+
+<% if @subscriptions.present? %>
+  <ul>
+    <% @subscriptions.each do |subscription| %>
+      <li>
+        <strong>Plan Name:</strong> <%= subscription.plan_name %><br>
+        <strong>Status:</strong> <%= subscription.active ? "Active" : "Inactive" %>
+      </li>
+    <% end %>
+  </ul>
+<% else %>
+  <p>No subscriptions found.</p>
+<% end %>
+
+
+
+<h2>Support Tickets</h2>
+
+<% if @support_tickets.present? %>
+  <% @support_tickets.each do |ticket| %>
+    <div class="ticket">
+      <p><strong>Subject:</strong> <%= ticket.subject %></p>
+      <p><strong>Description:</strong> <%= ticket.description %></p>
+    </div>
+  <% end %>
+<% else %>
+  <p>No support tickets found.</p>
+<% end %>
+
+
+
+<h2>Tickets</h2>
+
+<% @events.each do |event| %>
+  <% if event.respond_to?(:tickets) %>
+    <% event.tickets.where(user: @user).each do |ticket| %>
+      <p>
+        <strong>Event:</strong> <%= event.name %><br>
+        <strong>Seat:</strong> <%= ticket.seat_number %><br>
+        <strong>Purchased on:</strong>
+        <%= ticket.created_at.strftime("%d %b %Y, %I:%M %p") %>
+      </p>
+    <% end %>
+  <% end %>
+<% end %>
+
+

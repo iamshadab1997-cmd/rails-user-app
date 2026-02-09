@@ -1,0 +1,68 @@
+<%= form_with model: user, local: true, multipart: true, data: { turbo: false } do |f| %>
+
+  <% if user.errors.any? %>
+    <div style="color: red;">
+      <h4><%= pluralize(user.errors.count, "error") %> prohibited this user from being saved:</h4>
+      <ul>
+        <% user.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <p>
+    <%= f.label :name %><br>
+    <%= f.text_field :name %>
+  </p>
+
+  <p>
+    <%= f.label :email %><br>
+    <%= f.email_field :email %>
+  </p>
+
+  <% if user.new_record? %>
+    <p>
+      <%= f.label :password %><br>
+      <%= f.password_field :password %>
+    </p>
+
+    <p>
+      <%= f.label :password_confirmation %><br>
+      <%= f.password_field :password_confirmation %>
+    </p>
+  <% end %>
+
+  <p>
+    <%= f.label :documents, "Upload Documents" %><br>
+    <%= f.file_field :documents, multiple: true %>
+  </p>
+
+  <hr>
+
+  <h3>Profile</h3>
+
+  <%= f.fields_for :profile do |pf| %>
+
+    <%= pf.hidden_field :id if pf.object.persisted? %>
+
+    <p>
+      <%= pf.label :phone %><br>
+      <%= pf.text_field :phone %>
+    </p>
+
+    <p>
+      <%= pf.label :address %><br>
+      <%= pf.text_area :address %>
+    </p>
+
+    <p>
+      <%= pf.label :bio %><br>
+      <%= pf.text_area :bio %>
+    </p>
+
+  <% end %>
+
+  <%= f.submit %>
+
+<% end %>

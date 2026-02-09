@@ -1,0 +1,39 @@
+<h1>All Users</h1>
+
+<%= link_to "Create New User", new_user_path, class: "btn btn-primary" %>
+<hr>
+
+<% @users.each do |user| %>
+  <div style="margin-bottom: 20px; padding: 10px; border: 1px solid #ccc; border-radius: 8px;">
+    <p>
+      <strong>Name:</strong> <%= user.name %><br>
+      <strong>Email:</strong> <%= user.email %><br>
+      <strong>Role:</strong> <%= user.role.titleize %><br>
+      <strong>Status:</strong> <%= user.status.titleize %><br>
+
+      <% if user.documents.attached? %>
+        <strong>Documents:</strong><br>
+        <% user.documents.each do |doc| %>
+          <% if doc.image? %>
+            <%= image_tag doc, width: 140, height: 180, style: "border-radius: 8px; margin: 5px;" %>
+          <% else %>
+            <%= link_to doc.filename, url_for(doc), target: "_blank" %><br>
+          <% end %>
+        <% end %>
+      <% else %>
+        <em>No documents uploaded</em>
+      <% end %>
+    </p>
+
+    <!-- CRUD LINKS -->
+    <div style="margin-top: 10px;">
+      <%= link_to "View", user_path(user), class: "btn btn-info" %>
+      <%= link_to "Edit", edit_user_path(user), class: "btn btn-warning" %>
+      <%= button_to "Delete",
+            user_path(user),
+            method: :delete,
+            data: { confirm: "Are you sure?" },
+            class: "btn btn-danger" %>
+    </div>
+  </div>
+<% end %>
