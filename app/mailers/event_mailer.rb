@@ -1,17 +1,35 @@
 class EventMailer < ApplicationMailer
-  default from: "noreply@example.com"
+  default from: "amin@example.com"
+  layout "mailer"
 
-  # Email for event creation
   def event_created(event)
     @event = event
-    mail(to: @event.user.email, subject: "Event Created!")
+    attach_banner_if_present
+
+    mail(
+      to: @event.user.email,
+      subject: "Event Created!"
+    )
   end
 
-  # Email for event update
   def event_updated(event)
     @event = event
-    mail(to: @event.user.email, subject: "Event Updated!")
+    attach_banner_if_present
+
+    mail(
+      to: @event.user.email,
+      subject: "Event Updated!"
+    )
+  end
+
+  private
+
+  def attach_banner_if_present
+    return unless @event.banner.attached?
+
+    attachments[@event.banner.filename.to_s] =
+      @event.banner.download
+  rescue ActiveStorage::FileNotFoundError
+    Rails.logger.warn "Banner file missing for Event #{@event.id}"
   end
 end
-
-

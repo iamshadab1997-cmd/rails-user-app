@@ -1,36 +1,51 @@
 class CommentsController < ApplicationController
-  before_action :set_comment, only: [:show, :update, :destroy]
+ before_action :set_cart, only: [ :show, :edit, :update, :destroy ]
 
-  # GET /comments
-  def index
-    comments = Comment.all
-    render json: {
-      status: "success",
-      data: comments
-    }, status: :ok
-  end
+
+def index
+  @comments = Comment.limit(10) # simple pagination, optional
+
+  render json: {
+    status: "success",
+    total_count: @comments.count,
+    data: @comments.map do |c|
+      {
+        id: c.id,
+        body: c.body,
+        author_name: c.author_name,
+        email: c.email,
+        approved: c.approved,
+        commentable_type: c.commentable_type,
+        commentable_id: c.commentable_id,
+        created_at: c.created_at,
+        updated_at: c.updated_at
+      }
+    end
+  }, status: :ok
+end
+
 
   # GET /comments/:id
   def show
     render json: {
       status: "success",
-      data: @comment
+      data: CommentSerializer.new(@comment)
     }, status: :ok
   end
 
   # POST /comments
   def create
-    comment = Comment.new(comment_params)
-    if comment.save
+    @comment = Comment.new(comment_params)
+    if @comment.save
       render json: {
         status: "success",
         message: "Comment created successfully",
-        data: comment
+        data: CommentSerializer.new(@comment)
       }, status: :created
     else
       render json: {
         status: "error",
-        errors: comment.errors.full_messages
+        errors: @comment.errors.full_messages
       }, status: :unprocessable_entity
     end
   end
@@ -41,7 +56,7 @@ class CommentsController < ApplicationController
       render json: {
         status: "success",
         message: "Comment updated successfully",
-        data: @comment
+        data: CommentSerializer.new(@comment)
       }, status: :ok
     else
       render json: {
@@ -62,7 +77,7 @@ class CommentsController < ApplicationController
 
   private
 
-  # Set comment for show, update, destroy
+  # Set comment
   def set_comment
     @comment = Comment.find(params[:id])
   rescue ActiveRecord::RecordNotFound
@@ -72,12 +87,8 @@ class CommentsController < ApplicationController
     }, status: :not_found
   end
 
-  # Strong parameters
+  # Strong params
   def comment_params
     params.require(:comment).permit(:user_id, :commentable_id, :commentable_type, :body)
   end
 end
-
-
-
-

@@ -1,0 +1,21 @@
+<h1>Event Updated</h1>
+
+<p>Hello <%= @event.user.name %>,</p>
+
+<p>Your event has been updated successfully.</p>
+
+<ul>
+  <li><strong>Name:</strong> <%= @event.name %></li>
+  <li><strong>Location:</strong> <%= @event.location %></li>
+  <li><strong>Start:</strong> <%= @event.start_time %></li>
+  <li><strong>End:</strong> <%= @event.end_time %></li>
+</ul>
+
+<p>
+  <% if @event.banner.attached? %>
+    📎 Banner image attached with this email.
+  <% end %>
+</p>
+
+
+

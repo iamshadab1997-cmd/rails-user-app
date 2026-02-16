@@ -32,17 +32,7 @@
   <p>No profile yet. <%= link_to "Add Profile", new_user_profile_path(@user) %></p>
 <% end %>
 
-<h2>Addresses:</h2>
-<% (@addresses || []).each do |address| %>
-  <div style="border:1px solid #ccc; padding:10px; margin-bottom:15px; border-radius:8px; background-color:#f9f9f9;">
-    <p>
-      <strong>Street:</strong> <%= address.street %><br>
-      <strong>City:</strong> <%= address.city %><br>
-      <strong>State:</strong> <%= address.state %><br>
-     <strong>Type:</strong> <%= address.address_type %>
-    </p>
-  </div>
-<% end %>
+
 
 <h2>Documents:</h2>
 <% if @user.documents.attached? %>
@@ -60,57 +50,60 @@
 
 
     
-
-
 <!-- Cart -->
-<h2>Cart:</h2>
+<h2>Your Cart</h2>
+
 <% if @cart.present? %>
   <p><strong>Total Items:</strong> <%= @cart.total_items %></p>
   <p><strong>Total Price:</strong> ₹<%= @cart.total_price %></p>
+
+  <!-- Links for CRUD actions -->
+  <%= link_to "Edit Cart", edit_cart_path, class: "btn btn-primary" %>
+  <%= link_to "Delete Cart",
+        cart_path,
+        method: :delete,
+        data: { confirm: "Are you sure?" },
+        class: "btn btn-danger" %>
+
+  <!-- Cart Items -->
+  <% if @cart.cart_items.any? %>
+    <h3>Items:</h3>
+    <ul>
+      <% @cart.cart_items.each do |item| %>
+        <li>
+          <%= item.product.name %> -
+          ₹<%= item.product.price %> × <%= item.quantity %>
+        </li>
+      <% end %>
+    </ul>
+  <% else %>
+    <p><em>No items in the cart.</em></p>
+  <% end %>
+
 <% else %>
   <p><em>No cart available.</em></p>
+  <%= link_to "Create Cart", new_cart_path, class: "btn btn-primary" %>
 <% end %>
 
+<%= link_to "Back to Cart", cart_path, class: "btn btn-secondary mt-2" %>
 
-
-
-<h2>Addresses:</h2>
-<% @addresses.each do |address| %>
-  <div style="border:1px solid #ccc; padding:10px; margin-bottom:15px; border-radius:8px; background-color:#f9f9f9;">
-    <p>
-      <strong>Street:</strong> <%= address.street %><br>
-      <strong>City:</strong> <%= address.city %><br>
-      <strong>State:</strong> <%= address.state %><br>
-      <strong>Country:</strong> <%= address.country %><br>
-      <strong>Type:</strong> <%= address.address_type.capitalize %>
-    </p>
-
-    <!-- Display Attachments -->
-    <% if address.attachments.attached? %>
-      <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:10px;">
-        <% address.attachments.each do |att| %>
-          <% if att.image? %>
-            <%= image_tag att.variant(resize_to_limit: [150, 150]),
-                          alt: "Address Image",
-                          style: "border-radius:8px; border:1px solid #ccc;" %>
-          <% else %>
-            <p>
-              <%= link_to att.filename, url_for(att), target: "_blank" %>
-            </p>
-          <% end %>
-        <% end %>
-      </div>
-    <% else %>
-      <p><em>No attachments uploaded for this address.</em></p>
-    <% end %>
-  </div>
-<% end %>
+<%= link_to "Back to User", user_path(@user), class: "btn btn-secondary mt-2" %>
 
 
 
 <h2>Products:</h2>
+
+<%= link_to "Add New Product",
+            new_user_product_path(@user),
+            class: "btn btn-primary mb-3" %>
+
+<% if @products.blank? %>
+  <p><em>No products added yet.</em></p>
+<% end %>
+
 <% @products.each do |product| %>
   <div style="border:1px solid #ccc; padding:15px; margin-bottom:15px; border-radius:8px; background-color:#f9f9f9;">
+
     <p>
       <strong>Name:</strong> <%= product.name %> |
       <strong>Price:</strong> ₹<%= product.price %> |
@@ -120,8 +113,8 @@
     <% if product.images.attached? %>
       <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:10px;">
         <% product.images.each do |img| %>
-          <%= image_tag img.variant(resize_to_limit: [150, 150]), 
-                        alt: product.name, 
+          <%= image_tag img.variant(resize_to_limit: [150, 150]),
+                        alt: product.name,
                         style: "border-radius:8px; border:1px solid #ccc;" %>
         <% end %>
       </div>
@@ -129,15 +122,24 @@
       <p><em>No images uploaded for this product.</em></p>
     <% end %>
 
-    <!-- Inventories -->
-    <% if product.inventories.any? %>
-      <strong>Inventories:</strong>
-      <% product.inventories.each do |inv| %>
-        <p>Quantity: <%= inv.quantity %></p>
-      <% end %>
-    <% else %>
-      <p><em>No inventories available for this product.</em></p>
-    <% end %>
+    <!-- ACTION BUTTONS -->
+    <div style="margin-top:10px;">
+      <%= link_to "View",
+          user_product_path(@user, product),
+          class: "btn btn-sm btn-info" %>
+
+      <%= link_to "Edit",
+          edit_user_product_path(@user, product),
+          class: "btn btn-sm btn-warning" %>
+
+    <%= link_to "Delete",
+    user_product_path(@user, product),
+    data: {
+      turbo_method: :delete,
+      turbo_confirm: "Are you sure you want to delete this product?"
+    },
+    class: "btn btn-sm btn-danger" %>
+
 
   </div>
 <% end %>

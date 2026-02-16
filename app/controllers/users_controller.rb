@@ -13,6 +13,7 @@ class UsersController < ApplicationController
   # GET /users/:id
   def show
     @profile = @user.profile
+    @cart = @user.cart
     @addresses = @user.addresses || []
     @orders = @user.orders || []
     @products = @user.products || []
@@ -23,7 +24,7 @@ class UsersController < ApplicationController
     @notifications = @user.notifications || []
     @subscriptions = @user.subscriptions || []
     @support_tickets = @user.support_tickets || []
-      @tickets = Ticket.includes(:event).where(user: @user)
+    @tickets = Ticket.includes(:event).where(user: @user)
     @messages_sent = @user.sent_messages || []
     @messages_received = @user.received_messages || []
   end
@@ -33,25 +34,27 @@ class UsersController < ApplicationController
   def new
     @user = User.new
     @user.build_profile
+    @user.build_cart  # new cart automatically for new user
   end
 
   # ================= CREATE =================
   # POST /users
-def create
-  @user = User.new(user_params)
+  def create
+    @user = User.new(user_params)
 
-  if @user.save
-    redirect_to @user, notice: "User created successfully."
-  else
-    Rails.logger.debug @user.errors.full_messages
-    render :new, status: :unprocessable_entity
+    if @user.save
+      redirect_to @user, notice: "User created successfully."
+    else
+      Rails.logger.debug @user.errors.full_messages
+      render :new, status: :unprocessable_entity
+    end
   end
-end
 
   # ================= EDIT =================
   # GET /users/:id/edit
   def edit
     @user.build_profile unless @user.profile
+    @user.build_cart unless @user.cart  # ensure cart exists for editing
   end
 
   # ================= UPDATE =================
@@ -95,25 +98,29 @@ end
   def set_user
     @user = User.find(params[:id])
   end
-def user_params
-  params.require(:user).permit(
-    :name,
-    :email,
-    :role,
-    :status,
-    :email,
-    :password,
-    :password_confirmation,
-    documents: [],
-    profile_attributes: [
-      :id,
-      :phone,
-      :bio,
-      :address,
-      :_destroy,
-      images: []     
-    ]
-  )
-end
 
+  def user_params
+    params.require(:user).permit(
+      :name,
+      :email,
+      :role,
+      :status,
+      :password,
+      :password_confirmation,
+      documents: [],
+      profile_attributes: [
+        :id,
+        :phone,
+        :bio,
+        :address,
+        :_destroy,
+        images: []
+      ],
+      cart_attributes: [  # cart nested attributes
+        :id,
+        :total_items,
+        :total_price
+      ]
+    )
+  end
 end

@@ -1,46 +1,43 @@
 class CartsController < ApplicationController
-  def index
-    @carts = Cart.all
-  end
+ before_action :set_cart, only: [ :show, :edit, :destroy ]
 
+
+  # GET /cart
   def show
-    @cart = Cart.find(params[:id])
-  end
-
-  def new
-    @cart = Cart.new
-  end
-
-  def create
-    @cart = Cart.new(cart_params)
-    if @cart.save
-      redirect_to @cart
-    else
-      render :new
+    unless @cart
+      redirect_to root_path, alert: "Your cart is empty."
     end
   end
 
-  def edit
-    @cart = Cart.find(params[:id])
+  # POST /cart/add_item
+  def add_item
+    @cart = current_user.cart || current_user.create_cart(
+      total_items: 0,
+      total_price: 0
+    )
+
+    item = @cart.cart_items.find_or_initialize_by(
+      product_id: params[:product_id]
+    )
+
+    item.quantity ||= 0
+    item.quantity += 1
+    item.save!
+
+    redirect_to cart_path, notice: "Item added to cart"
   end
 
-  def update
-    @cart = Cart.find(params[:id])
-    if @cart.update(cart_params)
-      redirect_to @cart
-    else
-      render :edit
-    end
-  end
-
+  # DELETE /cart
   def destroy
-    Cart.find(params[:id]).destroy
-    redirect_to carts_path
+    return redirect_to root_path if @cart.nil?
+
+    @cart.destroy
+    redirect_to root_path, notice: "Cart deleted successfully."
   end
 
   private
 
-  def cart_params
-    params.require(:cart).permit(:user_id)
+  def set_cart
+    @cart = current_user.cart
   end
 end

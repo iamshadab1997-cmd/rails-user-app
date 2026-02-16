@@ -1,0 +1,20 @@
+<h1>My Cart</h1>
+
+<% if @cart.present? %>
+  <p><strong>Total Items:</strong> <%= @cart.total_items %></p>
+  <p><strong>Total Price:</strong> ₹<%= @cart.total_price %></p>
+
+  <%= link_to "Edit Cart", edit_cart_path, class: "btn btn-primary" %>
+  <%= link_to "Delete Cart", cart_path, method: :delete,
+        data: { confirm: "Are you sure?" },
+        class: "btn btn-danger" %>
+<% else %>
+  <p>No cart found.</p>
+  <%= link_to "Create Cart", new_cart_path, class: "btn btn-success" %>
+<% end %>
+
+
+<%= button_to "Add to Cart",
+      add_item_cart_path(product_id: product.id),
+      method: :post,
+      class: "btn btn-success" %>

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_02_05_120901) do
+ActiveRecord::Schema[8.1].define(version: 2026_02_11_121247) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -73,6 +73,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_05_120901) do
     t.integer "user_id", null: false
     t.index ["slug"], name: "index_blog_posts_on_slug", unique: true
     t.index ["user_id"], name: "index_blog_posts_on_user_id"
+  end
+
+  create_table "cart_items", force: :cascade do |t|
+    t.integer "cart_id", null: false
+    t.datetime "created_at", null: false
+    t.integer "product_id", null: false
+    t.integer "quantity"
+    t.datetime "updated_at", null: false
+    t.index ["cart_id"], name: "index_cart_items_on_cart_id"
+    t.index ["product_id"], name: "index_cart_items_on_product_id"
   end
 
   create_table "carts", force: :cascade do |t|
@@ -206,6 +216,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_05_120901) do
     t.datetime "created_at", null: false
     t.integer "product_id"
     t.integer "rating"
+    t.string "reviewer_name"
+    t.string "title"
     t.datetime "updated_at", null: false
     t.integer "user_id"
   end
@@ -236,6 +248,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_05_120901) do
     t.datetime "created_at", null: false
     t.integer "event_id"
     t.decimal "price"
+    t.integer "quantity"
     t.string "seat_number"
     t.string "status"
     t.datetime "updated_at", null: false
@@ -276,6 +289,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_05_120901) do
   add_foreign_key "addresses", "users"
   add_foreign_key "addresses", "users", on_delete: :cascade
   add_foreign_key "blog_posts", "users"
+  add_foreign_key "cart_items", "carts"
+  add_foreign_key "cart_items", "products"
   add_foreign_key "carts", "users"
   add_foreign_key "events", "users"
   add_foreign_key "inventories", "products"

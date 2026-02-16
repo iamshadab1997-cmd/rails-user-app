@@ -1,0 +1,35 @@
+<h2>Products of <%= @user.name %></h2>
+
+<%= link_to "Add New Product", new_user_product_path(@user), class: "btn btn-primary mb-3" %>
+
+<table class="table table-bordered">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Price</th>
+      <th>Stock</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @products.each do |product| %>
+      <tr>
+        <td><%= product.name %></td>
+        <td>₹ <%= product.price %></td>
+        <td><%= product.stock %></td>
+        <td>
+          <%= link_to "Show", user_product_path(@user, product), class: "btn btn-sm btn-info" %>
+          <%= link_to "Edit", edit_user_product_path(@user, product), class: "btn btn-sm btn-warning" %>
+          <%= link_to "Delete",
+              user_product_path(@user, product),
+              method: :delete,
+              data: { confirm: "Are you sure?" },
+              class: "btn btn-sm btn-danger" %>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<%= link_to "Back to User", user_path(@user), class: "btn btn-secondary" %>

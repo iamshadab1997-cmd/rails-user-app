@@ -1,12 +1,17 @@
 class BlogPostsController < ApplicationController
-  before_action :set_blog_post, only: [:show, :update, :destroy]
+  before_action :set_blog_post, only: [ :show, :update, :destroy ]
 
   # GET /blog_posts
   def index
-    blog_posts = BlogPost.all
+    blog_posts = BlogPost.page(params[:page]).per(10) # Kaminari pagination
     render json: {
       status: "success",
-      data: blog_posts
+      data: BlogPostSerializer.new(blog_posts).serializable_hash,
+      meta: {
+        current_page: blog_posts.current_page,
+        total_pages: blog_posts.total_pages,
+        total_count: blog_posts.total_count
+      }
     }, status: :ok
   end
 
@@ -14,19 +19,18 @@ class BlogPostsController < ApplicationController
   def show
     render json: {
       status: "success",
-      data: @blog_post
+      data: BlogPostSerializer.new(@blog_post).serializable_hash
     }, status: :ok
   end
 
   # POST /blog_posts
   def create
     blog_post = BlogPost.new(blog_post_params)
-
     if blog_post.save
       render json: {
         status: "success",
         message: "Blog post created successfully",
-        data: blog_post
+        data: BlogPostSerializer.new(blog_post).serializable_hash
       }, status: :created
     else
       render json: {
@@ -42,7 +46,7 @@ class BlogPostsController < ApplicationController
       render json: {
         status: "success",
         message: "Blog post updated successfully",
-        data: @blog_post
+        data: BlogPostSerializer.new(@blog_post).serializable_hash
       }, status: :ok
     else
       render json: {
@@ -69,13 +73,12 @@ class BlogPostsController < ApplicationController
   rescue ActiveRecord::RecordNotFound
     render json: {
       status: "error",
-      message: "Blog post not found"
+      errors: [ "Blog post not found" ]
     }, status: :not_found
   end
 
   # Strong parameters
-def blog_post_params
-  params.require(:blog_post).permit(:title, :content, :user_id, :image)
-end
-
+  def blog_post_params
+    params.require(:blog_post).permit(:title, :content, :user_id, :image)
+  end
 end

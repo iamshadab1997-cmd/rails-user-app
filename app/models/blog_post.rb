@@ -1,6 +1,6 @@
 class BlogPost < ApplicationRecord                # Inherits from ApplicationRecord; base model features
   belongs_to :user                                 # Each blog post belongs to a user (association)
-  has_one_attached :image  
+  has_one_attached :image
   has_many :comments, as: :commentable, dependent: :destroy  # Polymorphic association; comments are destroyed if post is deleted
 
   validates :title, presence: true                # Title is required; cannot save a post without it

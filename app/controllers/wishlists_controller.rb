@@ -1,13 +1,18 @@
 class WishlistsController < ApplicationController
-  before_action :set_wishlist, only: [:show, :update, :destroy]
+  before_action :set_wishlist, only: [ :show, :update, :destroy ]
 
   # GET /wishlists
   def index
-    wishlists = Wishlist.all
+    wishlists = Wishlist.page(params[:page]).per(10)
 
     render json: {
       status: "success",
-      data: wishlists
+      data: WishlistSerializer.new(wishlists).serializable_hash[:data],
+      meta: {
+        current_page: wishlists.current_page,
+        total_pages: wishlists.total_pages,
+        total_count: wishlists.total_count
+      }
     }, status: :ok
   end
 
@@ -15,7 +20,7 @@ class WishlistsController < ApplicationController
   def show
     render json: {
       status: "success",
-      data: @wishlist
+      data: WishlistSerializer.new(@wishlist).serializable_hash[:data]
     }, status: :ok
   end
 
@@ -26,8 +31,7 @@ class WishlistsController < ApplicationController
     if wishlist.save
       render json: {
         status: "success",
-        message: "Wishlist created successfully",
-        data: wishlist
+        data: WishlistSerializer.new(wishlist).serializable_hash[:data]
       }, status: :created
     else
       render json: {
@@ -42,8 +46,7 @@ class WishlistsController < ApplicationController
     if @wishlist.update(wishlist_params)
       render json: {
         status: "success",
-        message: "Wishlist updated successfully",
-        data: @wishlist
+        data: WishlistSerializer.new(@wishlist).serializable_hash[:data]
       }, status: :ok
     else
       render json: {
@@ -56,7 +59,6 @@ class WishlistsController < ApplicationController
   # DELETE /wishlists/:id
   def destroy
     @wishlist.destroy
-
     render json: {
       status: "success",
       message: "Wishlist deleted successfully"
@@ -70,7 +72,7 @@ class WishlistsController < ApplicationController
   rescue ActiveRecord::RecordNotFound
     render json: {
       status: "error",
-      message: "Wishlist not found"
+      errors: [ "Wishlist not found" ]
     }, status: :not_found
   end
 

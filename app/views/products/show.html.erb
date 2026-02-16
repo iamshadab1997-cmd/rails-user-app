@@ -1,0 +1,16 @@
+<h2><%= @product.name %></h2>
+
+<p><strong>Price:</strong> ₹ <%= @product.price %></p>
+<p><strong>Stock:</strong> <%= @product.stock %></p>
+
+<% if @product.images.attached? %>
+  <h4>Images</h4>
+  <% @product.images.each do |image| %>
+    <%= image_tag image, width: 150, class: "me-2 mb-2" %>
+  <% end %>
+<% end %>
+
+<hr>
+
+<%= link_to "Edit", edit_user_product_path(@user, @product), class: "btn btn-warning" %>
+<%= link_to "Back to Products", user_products_path(@user), class: "btn btn-secondary" %>

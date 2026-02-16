@@ -1,0 +1,41 @@
+<%= form_with model: [@user, @product], local: true,
+  data: { controller: "image-preview" },
+  class: "product-form" do |f| %>
+
+  <% if @product.errors.any? %>
+    <div class="product-errors">
+      <ul>
+        <% @product.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="form-group">
+    <%= f.label :name, class: "form-label" %>
+    <%= f.text_field :name, class: "form-input" %>
+  </div>
+
+  <div class="form-group">
+    <%= f.label :price, class: "form-label" %>
+    <%= f.number_field :price, step: 0.01, class: "form-input" %>
+  </div>
+
+  <div class="form-group">
+    <%= f.label :stock, class: "form-label" %>
+    <%= f.number_field :stock, class: "form-input" %>
+  </div>
+
+  <div class="form-group">
+    <%= f.label :images, class: "form-label" %>
+    <%= f.file_field :images,
+          multiple: true,
+          data: { target: "image-preview.input", action: "change->image-preview#preview" },
+          class: "form-file-input" %>
+
+    <div data-image-preview-target="preview" class="image-preview-container"></div>
+  </div>
+
+  <%= f.submit "Save Product", class: "form-submit" %>
+<% end %>

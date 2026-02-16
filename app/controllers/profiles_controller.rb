@@ -1,7 +1,7 @@
 # app/controllers/profiles_controller.rb
 class ProfilesController < ApplicationController
   before_action :set_user
-  before_action :set_profile, only: [:show, :edit, :update, :destroy]
+  before_action :set_profile, only: [ :show, :edit, :update, :destroy ]
 
   # GET /users/:user_id/profile
   def show
@@ -35,7 +35,7 @@ class ProfilesController < ApplicationController
     end
   end
 
-  # DELETE /users/:user_id/profile
+# DELETE /users/:user_id/profile
 def destroy
   @profile.destroy
   redirect_to user_path(@user), notice: "Profile deleted successfully."

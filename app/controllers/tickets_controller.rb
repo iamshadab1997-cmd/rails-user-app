@@ -1,13 +1,18 @@
 class TicketsController < ApplicationController
-  before_action :set_ticket, only: [:show, :update, :destroy]
+  before_action :set_ticket, only: [ :show, :update, :destroy ]
 
   # GET /tickets
   def index
-    tickets = Ticket.all
+    tickets = Ticket.page(params[:page]).per(5)
+
     render json: {
       status: "success",
-      count: tickets.size,
-      data: tickets
+      data: TicketSerializer.new(tickets).serializable_hash[:data],
+      meta: {
+        current_page: tickets.current_page,
+        total_pages: tickets.total_pages,
+        total_count: tickets.total_count
+      }
     }, status: :ok
   end
 
@@ -15,7 +20,7 @@ class TicketsController < ApplicationController
   def show
     render json: {
       status: "success",
-      data: @ticket
+      data: TicketSerializer.new(@ticket).serializable_hash[:data]
     }, status: :ok
   end
 
@@ -26,8 +31,7 @@ class TicketsController < ApplicationController
     if ticket.save
       render json: {
         status: "success",
-        message: "Ticket created successfully",
-        data: ticket
+        data: TicketSerializer.new(ticket).serializable_hash[:data]
       }, status: :created
     else
       render json: {
@@ -42,8 +46,7 @@ class TicketsController < ApplicationController
     if @ticket.update(ticket_params)
       render json: {
         status: "success",
-        message: "Ticket updated successfully",
-        data: @ticket
+        data: TicketSerializer.new(@ticket).serializable_hash[:data]
       }, status: :ok
     else
       render json: {
@@ -69,7 +72,7 @@ class TicketsController < ApplicationController
   rescue ActiveRecord::RecordNotFound
     render json: {
       status: "error",
-      message: "Ticket not found"
+      errors: [ "Ticket not found" ]
     }, status: :not_found
   end
 

@@ -1,49 +1,59 @@
 class ProductsController < ApplicationController
+  before_action :set_user
+  before_action :set_product, only: [ :show, :edit, :update, :destroy ]
+
   def index
-    @products = Product.all
+    @products = @user.products
   end
 
   def show
-    @product = Product.find(params[:id])
   end
 
   def new
-    @product = Product.new
+    @product = @user.products.new
   end
 
   def create
-    @product = Product.new(product_params)
+    @product = @user.products.new(product_params)
+
     if @product.save
-      redirect_to @product
+      redirect_to [ @user, @product ], notice: "Product created successfully"
     else
       render :new
     end
   end
 
   def edit
-    @product = Product.find(params[:id])
   end
 
   def update
-    @product = Product.find(params[:id])
     if @product.update(product_params)
-      redirect_to @product
+      redirect_to [ @user, @product ], notice: "Product updated successfully"
     else
       render :edit
     end
   end
 
   def destroy
-    Product.find(params[:id]).destroy
-    redirect_to products_path
+    @product.destroy
+    redirect_to user_products_path(@user), notice: "Product deleted successfully"
   end
 
   def search
-    @products = Product.where("name ILIKE ?", "%#{params[:q]}%")
+    @products = @user.products.where("name ILIKE ?", "%#{params[:q]}%")
   end
 
   private
+
+  def set_user
+    @user = User.find(params[:user_id])
+  end
+
+  def set_product
+    @product = @user.products.find(params[:id])
+  end
+
   def product_params
-    params.require(:product).permit(:name, :price)
+    params.require(:product).permit(:name, :price, :stock, images: [])
   end
 end

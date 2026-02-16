@@ -1,0 +1,11 @@
+<h2>Cart Details</h2>
+
+<% if @cart.present? %>
+  <p><strong>Total Items:</strong> <%= @cart.total_items %></p>
+  <p><strong>Total Price:</strong> ₹<%= @cart.total_price %></p>
+<% else %>
+  <p><em>No cart available.</em></p>
+<% end %>
+
+<%= link_to "Back to User", user_path(@user) if @user %>
+

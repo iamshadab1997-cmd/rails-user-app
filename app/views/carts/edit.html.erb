@@ -1,0 +1,7 @@
+<h1>Edit Cart</h1>
+
+<%= render "form", cart: @cart %>
+
+<%= link_to "Back", cart_path %>
+
+<%= link_to "Back to User", user_path(current_user), class: "btn btn-secondary" %>

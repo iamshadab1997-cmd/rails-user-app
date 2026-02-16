@@ -1,0 +1,15 @@
+<%= form_with(model: @cart || false, local: true) do |f| %>
+  <div class="field">
+    <%= f.label :total_items %>
+    <%= f.number_field :total_items %>
+  </div>
+
+  <div class="field">
+    <%= f.label :total_price %>
+    <%= f.number_field :total_price, step: 0.01 %>
+  </div>
+
+  <div class="actions">
+    <%= f.submit class: "btn btn-primary" %>
+  </div>
+<% end %>

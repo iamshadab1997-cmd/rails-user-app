@@ -1,24 +1,26 @@
 class SupportTicketsController < ApplicationController
-  before_action :set_support_ticket, only: [:show, :update, :destroy]
+  before_action :set_support_ticket, only: [ :show, :update, :destroy ]
 
-  # GET /support_tickets
   def index
-    support_tickets = SupportTicket.all
+    support_tickets = SupportTicket.page(params[:page]).per(10)
     render json: {
       status: "success",
-      data: support_tickets
+      data: support_tickets.map { |t| SupportTicketSerializer.new(t).serializable_hash[:data][:attributes] },
+      meta: {
+        current_page: support_tickets.current_page,
+        total_pages: support_tickets.total_pages,
+        total_count: support_tickets.total_count
+      }
     }, status: :ok
   end
 
-  # GET /support_tickets/:id
   def show
     render json: {
       status: "success",
-      data: @support_ticket
+      data: SupportTicketSerializer.new(@support_ticket).serializable_hash[:data][:attributes]
     }, status: :ok
   end
 
-  # POST /support_tickets
   def create
     support_ticket = SupportTicket.new(support_ticket_params)
 
@@ -26,33 +28,31 @@ class SupportTicketsController < ApplicationController
       render json: {
         status: "success",
         message: "Support ticket created successfully",
-        data: support_ticket
+        data: SupportTicketSerializer.new(support_ticket).serializable_hash[:data][:attributes]
       }, status: :created
     else
       render json: {
         status: "error",
-        errors: support_ticket.errors.full_messages
+        errors: support_ticket.errors
       }, status: :unprocessable_entity
     end
   end
 
-  # PATCH/PUT /support_tickets/:id
   def update
     if @support_ticket.update(support_ticket_params)
       render json: {
         status: "success",
         message: "Support ticket updated successfully",
-        data: @support_ticket
+        data: SupportTicketSerializer.new(@support_ticket).serializable_hash[:data][:attributes]
       }, status: :ok
     else
       render json: {
         status: "error",
-        errors: @support_ticket.errors.full_messages
+        errors: @support_ticket.errors
       }, status: :unprocessable_entity
     end
   end
 
-  # DELETE /support_tickets/:id
   def destroy
     @support_ticket.destroy
     render json: {
@@ -66,20 +66,10 @@ class SupportTicketsController < ApplicationController
   def set_support_ticket
     @support_ticket = SupportTicket.find(params[:id])
   rescue ActiveRecord::RecordNotFound
-    render json: {
-      status: "error",
-      message: "Support ticket not found"
-    }, status: :not_found
+    render json: { status: "error", message: "Support ticket not found" }, status: :not_found
   end
 
-def support_ticket_params
-  params.require(:support_ticket).permit(
-    :user_id,
-    :subject,
-    :description,
-    :status,
-    :priority  
-  )
-end
-
+  def support_ticket_params
+    params.require(:support_ticket).permit(:user_id, :subject, :description, :status, :priority)
+  end
 end
